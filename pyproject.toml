@@ -1,0 +1,226 @@
+# https://pip.pypa.io/en/stable/reference/build-system/pyproject-toml/
+#
+# SPDX-FileCopyrightText: © Sebastian Thomschke and contributors
+# SPDX-License-Identifier: AGPL-3.0-or-later
+# SPDX-ArtifactOfProjectHomePage: https://github.com/Second-Hand-Friends/kleinanzeigen-bot/
+#
+
+[build-system] # https://backend.pdm-project.org/
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[project]
+name = "kleinanzeigen-bot"
+dynamic = ["version"]
+description = "Command line tool to publish ads on kleinanzeigen.de"
+readme = "README.md"
+authors = [
+    {name = "sebthom", email = "sebthom@users.noreply.github.com"},
+]
+license = {text = "AGPL-3.0-or-later"}
+
+classifiers = [  # https://pypi.org/classifiers/
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Operating System :: OS Independent",
+
+    "Intended Audience :: End Users/Desktop",
+    "Topic :: Office/Business",
+
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+    "Programming Language :: Python :: 3.10"
+]
+requires-python = ">=3.10,<3.13"
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/Second-Hand-Friends/kleinanzeigen-bot"
+Repository = "https://github.com/Second-Hand-Friends/kleinanzeigen-bot.git"
+Documentation = "https://github.com/Second-Hand-Friends/kleinanzeigen-bot/README.md"
+Issues = "https://github.com/Second-Hand-Friends/kleinanzeigen-bot/issues"
+
+
+#####################
+# pdm https://github.com/pdm-project/pdm/
+#####################
+[tool.pdm.version] # https://backend.pdm-project.org/metadata/#dynamic-project-version
+source = "call"
+getter = "version:get_version"
+write_to = "kleinanzeigen_bot/_version.py"
+write_template = "__version__ = '{}'\n"
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "autopep8",
+    "bandit",
+    "toml", # required by bandit
+    "tomli", # required by bandit
+    "pytest",
+    "pytest-rerunfailures",
+    "pyinstaller",
+    "pylint",
+    "mypy",
+    "pyright",
+]
+
+[tool.pdm.scripts] # https://pdm-project.org/latest/usage/scripts/
+app     = "python -m kleinanzeigen_bot"
+compile.cmd = "python -O -m PyInstaller pyinstaller.spec --clean"
+compile.env = {PYTHONHASHSEED = "1", SOURCE_DATE_EPOCH = "0"} # https://pyinstaller.org/en/stable/advanced-topics.html#creating-a-reproducible-build
+debug   = "python -m pdb -m kleinanzeigen_bot"
+format  = "autopep8 --recursive --in-place src tests --verbose"
+lint    = {shell = "pylint -v src tests && autopep8 -v --exit-code --recursive --diff src tests && mypy" }
+scan    = "bandit -c pyproject.toml -r src"
+test    = "python -m pytest --capture=tee-sys -v"
+utest   = "python -m pytest --capture=tee-sys -v -m 'not itest'"
+itest   = "python -m pytest --capture=tee-sys -v -m 'itest'"
+
+
+#####################
+# autopep8
+# https://pypi.org/project/autopep8/
+# https://github.com/hhatto/autopep8
+#####################
+[tool.autopep8]
+max_line_length = 160
+ignore = [ # https://github.com/hhatto/autopep8#features
+    "E124", # Don't change indention of multi-line statements
+    "E128", # Don't change indention of multi-line statements
+    "E231", # Don't add whitespace after colon (:) on type declaration
+    "E251", # Don't remove whitespace around parameter '=' sign.
+    "E401" # Don't put imports on separate lines
+]
+aggressive = 3
+
+
+#####################
+# bandit
+# https://pypi.org/project/bandit/
+# https://github.com/PyCQA/bandit
+#####################
+[tool.bandit]
+
+
+#####################
+# mypy
+# https://github.com/python/mypy
+#####################
+[tool.mypy]
+# https://mypy.readthedocs.io/en/stable/config_file.html
+#mypy_path = "$MYPY_CONFIG_FILE_DIR/tests/stubs"
+python_version = "3.10"
+files = "src,tests"
+strict = true
+disallow_untyped_calls = false
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+ignore_missing_imports = true
+show_error_codes = true
+warn_unused_ignores = true
+verbosity = 0
+
+
+#####################
+# pyright
+# https://github.com/microsoft/pyright/
+#####################
+[tool.pyright]
+# https://microsoft.github.io/pyright/#/configuration?id=main-configuration-options
+include = ["src", "tests"]
+defineConstant = { DEBUG = false }
+pythonVersion = "3.10"
+typeCheckingMode = "standard"
+
+
+#####################
+# pylint
+# https://pypi.org/project/pylint/
+# https://github.com/PyCQA/pylint
+#####################
+[tool.pylint.master]
+extension-pkg-whitelist = "win32api"
+ignore = "version.py"
+jobs = 4
+persistent = "no"
+
+# https://pylint.pycqa.org/en/latest/user_guide/checkers/extensions.html
+load-plugins = [
+    "pylint.extensions.bad_builtin",
+    #"pylint.extensions.broad_try_clause",
+    "pylint.extensions.check_elif",
+    "pylint.extensions.code_style",
+    "pylint.extensions.comparison_placement",
+    #"pylint.extensions.confusing_elif",
+    "pylint.extensions.consider_ternary_expression",
+    "pylint.extensions.consider_refactoring_into_while_condition",
+    "pylint.extensions.dict_init_mutate",
+    "pylint.extensions.docstyle",
+    #"pylint.extensions.docparams",
+    "pylint.extensions.dunder",
+    "pylint.extensions.empty_comment",
+    "pylint.extensions.eq_without_hash",
+    "pylint.extensions.for_any_all",
+    #"pylint.extensions.magic_value",
+    #"pylint.extensions.mccabe",
+    "pylint.extensions.set_membership",
+    "pylint.extensions.no_self_use",
+    "pylint.extensions.overlapping_exceptions",
+    "pylint.extensions.private_import",
+    "pylint.extensions.redefined_loop_name",
+    "pylint.extensions.redefined_variable_type",
+    "pylint.extensions.set_membership",
+    "pylint.extensions.typing",
+    #"pylint.extensions.while_used"
+]
+
+[tool.pylint.basic]
+good-names = ["i", "j", "k", "v", "by", "ex", "fd", "_", "T"]
+
+[tool.pylint.format]
+# https://pylint.pycqa.org/en/latest/technical_reference/features.html#format-checker
+# https://pylint.pycqa.org/en/latest/user_guide/checkers/features.html#format-checker-messages
+max-line-length = 160   # maximum number of characters on a single line (C0301)
+max-module-lines = 2000 # maximum number of lines in a module (C0302)
+
+[tool.pylint.logging]
+logging-modules = "logging"
+
+[tool.pylint.messages_control]
+# https://pylint.pycqa.org/en/latest/technical_reference/features.html#messages-control-options
+disable= [
+    "broad-except",
+    "consider-using-assignment-expr",
+    "docstring-first-line-empty",
+    "missing-docstring",
+    "multiple-imports",
+    "multiple-statements",
+    "no-self-use",
+    "no-member", # pylint cannot find async methods from super class
+    "too-few-public-methods"
+]
+
+[tool.pylint.miscelaneous]
+# https://pylint.pycqa.org/en/latest/user_guide/configuration/all-options.html#miscellaneous-checker
+notes = [ "FIXME", "XXX", "TODO" ] # list of note tags to take in consideration
+
+[tool.pylint.design]
+# https://pylint.pycqa.org/en/latest/user_guide/configuration/all-options.html#design-checker
+# https://pylint.pycqa.org/en/latest/user_guide/checkers/features.html#design-checker-messages
+max-attributes = 15 # maximum number of instance attributes for a class (R0902)
+max-branches   = 30 # maximum number of branch for function / method body (R0912)
+max-locals     = 30 # maximum number of local variables for function / method body (R0914)
+max-returns    = 10 # maximum number of return / yield for function / method body (R0911)
+max-statements = 100 # maximum number of statements in function / method body (R0915)
+max-public-methods = 30 # maximum number of public methods for a class (R0904)
+
+
+#####################
+# pytest
+# https://pypi.org/project/pytest/
+#####################
+[tool.pytest.ini_options]
+# https://docs.pytest.org/en/stable/reference.html#confval-addopts
+addopts = "--strict-markers -p no:cacheprovider --doctest-modules --ignore=kleinanzeigen_bot/__main__.py"
+markers = [
+    "itest: marks a test as an integration test (i.e. a test with external dependencies)"
+]
