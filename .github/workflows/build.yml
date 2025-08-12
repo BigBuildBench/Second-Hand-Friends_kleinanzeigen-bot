@@ -92,7 +92,7 @@ jobs:
 
 
     - name: Git checkout
-      uses: actions/checkout@v4  # https://github.com/actions/checkout
+      uses: actions/checkout@v5  # https://github.com/actions/checkout
 
 
     - name: "Install: Chromium Browser"
@@ -271,7 +271,7 @@ jobs:
 
     - name: Git checkout 
       # only required by "gh release create" to prevent "fatal: Not a git repository"
-      uses: actions/checkout@v4  #https://github.com/actions/checkout
+      uses: actions/checkout@v5  #https://github.com/actions/checkout
 
 
     - name: Delete untagged docker image
